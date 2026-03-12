@@ -246,6 +246,8 @@ open-browser run -p openrouter -m "meta-llama/llama-3.1-70b-instruct" "Find the 
 open-browser run -p openrouter -m "anthropic/claude-3.5-sonnet" "Extract all product prices from example.com"
 ```
 
+> **Cost tracking**: Token counts are always accurate. For OpenRouter models that map to a known provider model (e.g. `google/gemini-2.0-flash-001` → `gemini-2.0-flash`), cost estimates will be calculated from the built-in pricing table. For models not in the table (e.g. `meta-llama/llama-3.1-70b-instruct`), the cost display will show `$0.0000` — the actual charge from OpenRouter will still appear in your OpenRouter dashboard.
+
 ## Project Structure
 
 ```
