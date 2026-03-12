@@ -519,7 +519,12 @@ export function calculateStepCost(
 	const normalizedId = modelId.substring(modelId.lastIndexOf('/') + 1);
 
 	let pricing: PricingTable | undefined;
-	for (const [key, value] of Object.entries(PRICING_TABLE)) {
+	// Prefer the most specific (longest) matching key to handle overlapping prefixes
+	// like "gpt-4o" vs "gpt-4o-mini" in a stable, order-independent way.
+	const pricingEntries = Object.entries(PRICING_TABLE).sort(
+		([keyA], [keyB]) => keyB.length - keyA.length,
+	);
+	for (const [key, value] of pricingEntries) {
 		if (modelId.startsWith(key) || normalizedId.startsWith(key)) {
 			pricing = value;
 			break;
