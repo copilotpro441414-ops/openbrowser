@@ -55,8 +55,17 @@ async function createModel(provider: string, modelId: string): Promise<LanguageM
 		}
 		case 'openrouter': {
 			const { createOpenAI } = await import('@ai-sdk/openai');
+			const apiKey = process.env.OPENROUTER_API_KEY;
+
+			if (!apiKey) {
+				throw new Error(
+					'Missing OPENROUTER_API_KEY environment variable. ' +
+					'Please set OPENROUTER_API_KEY when using the "openrouter" provider.',
+				);
+			}
+
 			const openrouter = createOpenAI({
-				apiKey: process.env.OPENROUTER_API_KEY,
+				apiKey,
 				baseURL: 'https://openrouter.ai/api/v1',
 			});
 			languageModel = openrouter(modelId);
