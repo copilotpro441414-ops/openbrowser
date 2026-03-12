@@ -514,9 +514,18 @@ export function calculateStepCost(
 	outputTokens: number,
 	modelId: string,
 ): StepCostBreakdown | undefined {
+	// Normalize OpenRouter-style model IDs (e.g. "google/gemini-2.0-flash-001" -> "gemini-2.0-flash-001")
+	// so they can match entries in the pricing table.
+	const normalizedId = modelId.substring(modelId.lastIndexOf('/') + 1);
+
 	let pricing: PricingTable | undefined;
-	for (const [key, value] of Object.entries(PRICING_TABLE)) {
-		if (modelId.startsWith(key)) {
+	// Prefer the most specific (longest) matching key to handle overlapping prefixes
+	// like "gpt-4o" vs "gpt-4o-mini" in a stable, order-independent way.
+	const pricingEntries = Object.entries(PRICING_TABLE).sort(
+		([keyA], [keyB]) => keyB.length - keyA.length,
+	);
+	for (const [key, value] of pricingEntries) {
+		if (modelId.startsWith(key) || normalizedId.startsWith(key)) {
 			pricing = value;
 			break;
 		}

@@ -13,14 +13,14 @@
 
 ---
 
-Give an AI agent a browser. It clicks, types, navigates, and extracts data — autonomously completing tasks on any website. Built on Playwright with first-class support for OpenAI, Anthropic, and Google models.
+Give an AI agent a browser. It clicks, types, navigates, and extracts data — autonomously completing tasks on any website. Built on Playwright with first-class support for OpenAI, Anthropic, Google, and OpenRouter models.
 
 > **Production-ready since v1.0.** Contributions welcome.
 
 ## Why Open Browser?
 
 - **Autonomous agents**: Describe a task in natural language, and an AI agent navigates the web to complete it — clicking, typing, scrolling, and extracting data without manual scripting
-- **Multi-model support**: Works with OpenAI, Anthropic, and Google out of the box via the Vercel AI SDK — swap models with a single flag
+- **Multi-model support**: Works with OpenAI, Anthropic, Google, and OpenRouter out of the box via the Vercel AI SDK — swap models with a single flag
 - **Interactive REPL**: Drop into a live browser session and issue commands interactively — great for debugging, prototyping, and exploration
 - **Sandboxed execution**: Run agents in resource-limited environments with CPU/memory monitoring, timeouts, and domain restrictions
 - **Production-ready**: Stall detection, cost tracking, session management, replay recording, and comprehensive error handling
@@ -74,14 +74,14 @@ open-browser run "Sign up for the newsletter on example.com with test@email.com"
 open-browser run "Go to GitHub, find the open-browser repo, and star it"
 ```
 
-| Option                       | Description                               |
-| ---------------------------- | ----------------------------------------- |
-| `-m, --model <model>`        | Model to use (default: `gpt-4o`)          |
-| `-p, --provider <provider>`  | Provider: `openai`, `anthropic`, `google` |
-| `--headless / --no-headless` | Show or hide the browser window           |
-| `--max-steps <n>`            | Max agent steps (default: `25`)           |
-| `-v, --verbose`              | Show detailed step info                   |
-| `--no-cost`                  | Hide cost tracking                        |
+| Option                       | Description                                                    |
+| ---------------------------- | -------------------------------------------------------------- |
+| `-m, --model <model>`        | Model to use (default: `gpt-4o`)                               |
+| `-p, --provider <provider>`  | Provider: `openai`, `anthropic`, `google`, `openrouter`        |
+| `--headless / --no-headless` | Show or hide the browser window                                |
+| `--max-steps <n>`            | Max agent steps (default: `25`)                                |
+| `-v, --verbose`              | Show detailed step info                                        |
+| `--no-cost`                  | Hide cost tracking                                             |
 
 ### Browser Commands
 
@@ -166,6 +166,7 @@ console.log(result.metrics) // steps, URLs visited, CPU time
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_GENERATIVE_AI_API_KEY=...
+OPENROUTER_API_KEY=...
 
 # Browser
 BROWSER_HEADLESS=true
@@ -228,11 +229,24 @@ OPEN_BROWSER_SAVE_RECORDING_PATH=./recordings
 
 ## Model Support
 
-| Provider      | Example Models                                  | Flag           |
-| ------------- | ----------------------------------------------- | -------------- |
-| **OpenAI**    | `gpt-4o`, `gpt-4o-mini`, `o1`                   | `-p openai`    |
-| **Anthropic** | `claude-sonnet-4-5-20250929`, `claude-opus-4-6` | `-p anthropic` |
-| **Google**    | `gemini-2.0-flash`, `gemini-2.5-pro`            | `-p google`    |
+| Provider         | Example Models                                         | Flag              |
+| ---------------- | ------------------------------------------------------ | ----------------- |
+| **OpenAI**       | `gpt-4o`, `gpt-4o-mini`, `o1`                          | `-p openai`       |
+| **Anthropic**    | `claude-sonnet-4-5-20250929`, `claude-opus-4-6`        | `-p anthropic`    |
+| **Google**       | `gemini-2.0-flash`, `gemini-2.5-pro`                   | `-p google`       |
+| **OpenRouter**   | `google/gemini-2.0-flash-001`, `meta-llama/llama-3.1-70b-instruct` | `-p openrouter`   |
+
+### OpenRouter
+
+[OpenRouter](https://openrouter.ai) provides access to hundreds of models from different providers through a single API. Set `OPENROUTER_API_KEY` in your `.env` file and use the `-p openrouter` flag with the full OpenRouter model string:
+
+```bash
+open-browser run -p openrouter -m "google/gemini-2.0-flash-001" "Summarize the top story on Hacker News"
+open-browser run -p openrouter -m "meta-llama/llama-3.1-70b-instruct" "Find the latest TypeScript release notes"
+open-browser run -p openrouter -m "anthropic/claude-3.5-sonnet" "Extract all product prices from example.com"
+```
+
+> **Cost tracking**: Token counts are always accurate. For OpenRouter models that map to a known provider model (e.g. `google/gemini-2.0-flash-001` → `gemini-2.0-flash`), cost estimates will be calculated from the built-in pricing table. For models not in the table (e.g. `meta-llama/llama-3.1-70b-instruct`), the cost display will show `$0.0000` — the actual charge from OpenRouter will still appear in your OpenRouter dashboard.
 
 ## Project Structure
 

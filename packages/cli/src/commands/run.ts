@@ -53,14 +53,35 @@ async function createModel(provider: string, modelId: string): Promise<LanguageM
 			languageModel = google(modelId);
 			break;
 		}
+		case 'openrouter': {
+			const { createOpenAI } = await import('@ai-sdk/openai');
+			const apiKey = process.env.OPENROUTER_API_KEY;
+
+			if (!apiKey) {
+				throw new Error(
+					'Missing OPENROUTER_API_KEY environment variable. ' +
+					'Please set OPENROUTER_API_KEY when using the "openrouter" provider.',
+				);
+			}
+
+			const openrouter = createOpenAI({
+				apiKey,
+				baseURL: 'https://openrouter.ai/api/v1',
+			});
+			languageModel = openrouter(modelId);
+			break;
+		}
 		default:
 			throw new Error(
 				`Unsupported provider: ${provider}. ` +
-				'Supported: openai, anthropic, google',
+				'Supported: openai, anthropic, google, openrouter',
 			);
 	}
 
-	return new VercelModelAdapter({ model: languageModel });
+	return new VercelModelAdapter({
+		model: languageModel,
+		provider: provider === 'openrouter' ? 'openrouter' : undefined,
+	});
 }
 
 export function registerRunCommand(program: Command): void {
@@ -69,7 +90,7 @@ export function registerRunCommand(program: Command): void {
 		.description('Run an AI agent to complete a browser task')
 		.argument('<task>', 'Description of the task for the agent to complete')
 		.option('-m, --model <model>', 'Model ID to use', 'gpt-4o')
-		.option('-p, --provider <provider>', 'LLM provider (openai, anthropic, google)', 'openai')
+		.option('-p, --provider <provider>', 'LLM provider (openai, anthropic, google, openrouter)', 'openai')
 		.option('--headless', 'Run browser in headless mode', true)
 		.option('--no-headless', 'Show the browser window')
 		.option('--max-steps <n>', 'Maximum number of agent steps', '25')
