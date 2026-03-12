@@ -7,6 +7,7 @@ export type ModelProvider =
 	| 'anthropic'
 	| 'openai'
 	| 'google'
+	| 'openrouter'
 	| 'mistral'
 	| 'deepseek'
 	| 'groq'
